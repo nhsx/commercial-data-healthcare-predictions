@@ -121,18 +121,6 @@ print(r1)
 #save to file tabled MCR scores
 r1.to_csv("mcr_padrus_scores.csv")
 
-#save to file MCR visual
-#def plot_mcr(df_in, fig_size = (11.7, 8.27)):
- #   df_in = df_in.copy()
-  #  df_in.columns = [ x.replace('MCR+', 'MCR- (lollypops) | MCR+ (bars)') for x in df_in.columns]
-  #  ax = sns.barplot(x='MCR- (lollypops) | MCR+ (bars)',y='variable',data=df_in)
-  #  plt.gcf().set_size_inches(fig_size)
-   # plt.hlines(y=range(df_in.shape[0]), xmin=0, xmax=df_in['MCR-'], color='skyblue')
-   # plt.plot(df_in['MCR-'], range(df_in.shape[0]), "o", color = 'skyblue')
-
-#plot_mcr(r1)
-#plt.savefig("mcr_padrus.png", dpi = 600)
-
 # Make a list of columns to create grouped variables for grouped MCR
 
 week_col = ['weeknum']
