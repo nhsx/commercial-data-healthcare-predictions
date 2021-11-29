@@ -26,11 +26,13 @@
 # -Line plots showing (1)predictions (2) predictions and actual targets
 # -Plots feature importance using the following variable importance tools: random forest, permutation, SHAP
 
+# python 3.6.9
+
 #Imports some key packages
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd # version 1.1.5
+import numpy as np # version 1.19.5
+import matplotlib.pyplot as plt # version 3.3.4
+import seaborn as sns # version 0.11.2
 
 #Creates dataframe from csv
 #fyi in this analysis imported csv is sorted by date - this data order is needed in order for data splitting without leakage later on
@@ -136,7 +138,7 @@ print ('y_train shape', y_train.shape)
 print ('X_train shape', X_train.shape)
 
 # import time series split
-from sklearn.model_selection import TimeSeriesSplit
+from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
 
 #split training data in order to optimise RF model on it
 #test_size set to ensure no data leakage at 9106 [depends on size of training data so needs updating if training data size changes]
@@ -337,7 +339,7 @@ plt.xlabel("Permutation Importance")
 plt.show()
 
 #import SHAP(SHapley Addictive exPlanations) variable importance tool
-import shap
+import shap # version 0.39.0
 
 #SHAP very computationally expensive - run on sample of 10 (check its working), 100, 1000 (compare to see if major changes between two)
 X_train_shap = shap.sample(X_train, 10)
