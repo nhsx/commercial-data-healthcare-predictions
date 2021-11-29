@@ -11,20 +11,21 @@
 # -Imports key packages for MCR & analysis -Changes date to python date category type -Assigns y (the target variable the model needs to predict) -Assigns X (the features- variables inputted in order to predict y)-Splits data into training and test data -Check dataset sizes -Time series data split for cross validation - Cross validation grid search to find optimum hyperparameters for random forest regressor (remembering bootstrap parameter has to be set to False in order for MCR package to work) -Scores for R2, RSME and MAE on test data using model from grid search - Conduct MCR measuring importance of variables across Rashomon set - Save to file MCR scores and visual - Create grouped variables(features) for grouped MCR - Conduct grouped MCR
 # Important note: In order for MCR to work you must have already created a 'Rashomon set' see report, a model who's instances produce a set of optimal ('best performing') models which can consistently make successful predictions. The code provided works effectively on a dataset that we cannot make public here due to health and commercial sensitivity/privacy - the example data given to run the code will not give you a model with high predictive accuracy i.e. the results on the MCR will not output valid/useful results - however, you can adapt this code to run on your own 'Rashomon sets' created in your own work and using other datasets.
 
+#python 3.6.9
 
 #Import some key packages for MCR
-from mcrforest.forest import RandomForestRegressor
-import pickle
+from mcrforest.forest import RandomForestRegressor # version 3.0.1
+import pickle # version 4.0
 import mcrforest
-import numpy as np
+import numpy as np # version 1.19.5
 
 from pkg_resources import get_distribution
 print(get_distribution('mcrforest').version)
 
 #import packages for analysis
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import pandas as pd # version 1.1.5
+import matplotlib.pyplot as plt # version 3.3.4
+import seaborn as sns # version 0.11.2
 
 #create dataframe from survey data
 df = pd.read_csv('padrus_data_weather.csv')
@@ -65,7 +66,7 @@ print(len(X_train),len(y_train), 'train examples')
 print(len(X_test),len(y_test), 'test examples')
 
 # import time series split
-from sklearn.model_selection import TimeSeriesSplit
+from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
 
 #split training data in order to optimise RF model on it
 #test_size set to ensure no data leakage at 13,188
