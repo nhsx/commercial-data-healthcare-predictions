@@ -108,7 +108,7 @@ modelg = RandomForestRegressor(**best_params)
 #modelg.debug()
 modelg.fit(X_train.values[:45844,:], y_train.values.flatten()[:45844])
 plt.rcParams.update({'font.size': 7})
-r1 = modelg.plot_mcr(X_train.values[:45844,:], y_train.values.flatten()[:45844], num_times = 10, show_fig = False, feature_names = X_train.columns.tolist() )
+r1 = modelg.plot_mcr(X_train.values[:45844,:], y_train.values.flatten()[:45844], num_times = 10, show_fig = True, feature_names = X_train.columns.tolist() )
 
 #tabled MCR scores
 print(r1)
@@ -154,7 +154,7 @@ for i, g in enumerate(grouping_names):
 
 ## Grouped MCR 
 
-r2 = modelg.plot_mcr(X_train, y_train.values.flatten(), feature_groups_of_interest = mcr_groupings, feature_names = grouping_names, num_times = 10, show_fig = False )
+r2 = modelg.plot_mcr(X_train, y_train.values.flatten(), feature_groups_of_interest = mcr_groupings, feature_names = grouping_names, num_times = 10, show_fig = True )
 
 #Table scores for grouped MCR
 print(r2)

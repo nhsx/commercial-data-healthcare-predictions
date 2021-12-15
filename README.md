@@ -32,8 +32,9 @@ To clone the repo:
 `git clone https://github.com/nhsx/commercial-data-healthcare-predictions.git`
 
 To create a suitable environment:
-- ```python -m venv env```
-- `source env/bin/activate`
+- ```python -m venv env``` or ```virtualenv -p /path/to/required/python/version .venv```
+- `source .venv/bin/activate`
+- (may need to) `pip install numpy` & `pip install Cython`
 - `pip install git+https://github.com/gavin-s-smith/mcrforest`
 - `pip install -r requirements.txt`
 
