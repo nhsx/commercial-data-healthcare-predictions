@@ -27,8 +27,15 @@ import pandas as pd # version 1.1.5
 import matplotlib.pyplot as plt # version 3.3.4
 import seaborn as sns # version 0.11.2
 
+from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
+from sklearn.ensemble import RandomForestRegressor as RF_sklearn
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
+
 #create dataframe from survey data
-df = pd.read_csv('padrus_data_weather.csv')
+df = pd.read_csv('data/fake_feature_metadata.csv')
 
 #change column to data type 'category', change date column data to 'datetime' data type
 df['date'] = pd.to_datetime(df['date'])
@@ -53,7 +60,6 @@ X = df[['weeknum', 'ltla_week_sales_17', 'decongestant_17', 'throat_17',
 
 print('X','\n',X)
 
-
 # data split into train and test data
 
 X_train = X.iloc[:45844,:]
@@ -65,9 +71,6 @@ y_test = y.iloc[45844:66254,]
 print(len(X_train),len(y_train), 'train examples')
 print(len(X_test),len(y_test), 'test examples')
 
-# import time series split
-from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
-
 #split training data in order to optimise RF model on it
 #test_size set to ensure no data leakage at 13,188
 #45,844 of training data rows, 314 instances of 146 weeks, around a fifth of 146 is 29, 29x314 = 9106
@@ -75,11 +78,7 @@ from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
 tscv = TimeSeriesSplit(n_splits=4, test_size=9106)
 print(tscv)
 
-# import random forest remember no bootstrapping for MCR
-from sklearn.ensemble import RandomForestRegressor as RF_sklearn
-
 #Cross validation grid search to find optimum hyperparameters for random forest regressor
-from sklearn.model_selection import GridSearchCV
 rfc = RF_sklearn(random_state = 42)
 param_grid = { 
             "n_estimators"      : [200, 300, 400], #300 otpimum tested 100,600
@@ -94,10 +93,6 @@ predictions = grid.predict(X_test)
 print(grid.best_params_)
 
 #Scores for R2, RSME and MAE on test data using model from grid search
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_error
-
 rf_mse = mean_squared_error(y_test, predictions)
 rf_rmse = np.sqrt(rf_mse)
 print('RMSE', rf_rmse)
@@ -105,7 +100,6 @@ print('r2', r2_score(y_test, predictions))
 print('MAE', mean_absolute_error(y_test, predictions))
 
 # conduct MCR
-from mcrforest.forest import RandomForestRegressor
 best_params = grid.best_params_
 best_params['random_state'] = 42
 best_params['n_jobs'] = -1
@@ -120,7 +114,7 @@ r1 = modelg.plot_mcr(X_train.values[:45844,:], y_train.values.flatten()[:45844],
 print(r1)
 
 #save to file tabled MCR scores
-r1.to_csv("mcr_padrus_scores.csv")
+r1.to_csv("fake_outputs/mcr_padrus_scores.csv")
 
 # Make a list of columns to create grouped variables for grouped MCR
 
@@ -164,5 +158,3 @@ r2 = modelg.plot_mcr(X_train, y_train.values.flatten(), feature_groups_of_intere
 
 #Table scores for grouped MCR
 print(r2)
-
-

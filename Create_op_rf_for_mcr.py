@@ -33,60 +33,44 @@ import pandas as pd # version 1.1.5
 import numpy as np # version 1.19.5
 import matplotlib.pyplot as plt # version 3.3.4
 import seaborn as sns # version 0.11.2
+from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
+from sklearn.ensemble import RandomForestRegressor as RF_sklearn
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import r2_score
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import r2_score
+from sklearn.inspection import permutation_importance
+import shap
 
 #Creates dataframe from csv
 #fyi in this analysis imported csv is sorted by date - this data order is needed in order for data splitting without leakage later on
-df = pd.read_csv('padrus_data_weather.csv')
-
-
-#how many rows and columns in data
-print('Data shape','\n', df.shape)
-
-# how many ltla's (lower tier local authorities)
-print('Data rows for each local authorities','\n', df['ltla_code.1'].value_counts())
-
-#how many dates (and for each ltla)
-print('Data rows for each week','\n', df['date'].value_counts())
-
-#describes dataframe
-print('Description of data','\n', df.describe())
-
-#sums total sales
-print('Total sales (17 day lag)','\n', df['ltla_week_sales_17'].sum())
-
-#sums total cough sales (17 days in advance)
-print('Total cough sales (17 day lag)','\n', df['cough_all_17'].sum())
-
-#sums deaths from respiratory disease
-print('Total deaths','\n', df['cnt'].sum())
-
-#check start of data incl. start date
-print ('Data head','\n', df.head())
-
-#check end of data incl. end date
-print ('Data tail','\n', df.tail())
+df = pd.read_csv('data/fake_feature_metadata.csv')
+print('\n','----Check read in data----')
+print('Data shape','\n', df.shape) #how many rows and columns in data
+print('Data rows for each local authorities','\n', df['ltla_code.1'].value_counts()) # how many ltla's (lower tier local authorities)
+print('Data rows for each week','\n', df['date'].value_counts()) #how many dates (and for each ltla)
+print('Description of data','\n', df.describe()) #describes dataframe
+print('Total sales (17 day lag)','\n', df['ltla_week_sales_17'].sum()) #sums total sales
+print('Total cough sales (17 day lag)','\n', df['cough_all_17'].sum()) #sums total cough sales (17 days in advance)
+print('Total deaths','\n', df['cnt'].sum()) #sums deaths from respiratory disease
+print('Data head','\n', df.head()) #check start of data incl. start date
+print('Data tail','\n', df.tail()) #check end of data incl. end date
 
 #change date column data to 'datetime' data type
 df['date'] = pd.to_datetime(df['date'])
-
-# check date change
-print ('Data head with new date format','\n', df.head())
-
-# check date change
-print ('Data tail with new date format','\n', df.tail())
+print('Data head with new date format','\n', df.head()) # check date change
+print('Data tail with new date format','\n', df.tail()) # check date change
 
 # check date change
 dc = df['date'].unique()
-print ('Number of unique dates','\n', len(dc))
-
-# check date change
-print ('Data types','\n', df.dtypes)
+print('Number of unique dates','\n', len(dc))
+print('Data types','\n', df.dtypes) # check date change
 
 #assign data to y target
 y = df['cnt']
-
-#check y
-print('y','\n', y)
+print('\n','----assign data to y and x----')
+print('y','\n', y) #check y
 
 #assign data to X features
 X = df[['weeknum', 'ltla_week_sales_17', 'decongestant_17', 'throat_17', 
@@ -101,16 +85,13 @@ X = df[['weeknum', 'ltla_week_sales_17', 'decongestant_17', 'throat_17',
         'pct_other_children', 'pct_detached', 'pct_semi', 'pct_terraced', 'pct_flat', 'average_rainfall',
         'total_rainfall', 'min_temp', 'average_temp', 'max_temp']] 
 
-# check X
-print('X', '\n', X)
 
-#used to check manually selected data rows for split are correct
-print ('Last row of training data - where data will be split', '\n', df.loc[45843])
-
-print ('First row of testing data - where data will be split', '\n', df.loc[45844])
+print('X', '\n', X) # check X
+print('\n','----Check training and test data splits----')
+print('Last row of training data - where data will be split', '\n', df.loc[45843]) #used to check manually selected data rows for split are correct
+print('First row of testing data - where data will be split', '\n', df.loc[45844])
 
 # data split into train and test data, extra covid test set
-
 X_train = X.iloc[:45844,:]
 X_test = X.iloc[45844:66254,:]
 X_covid_test = X.iloc[66254:,:] #covid period
@@ -118,33 +99,21 @@ y_train = y.iloc[:45844,]
 y_test = y.iloc[45844:66254,]
 y_covid_test = y.iloc[66254:,] #covid period
 
-#check training data
-print ('X_train', '\n', X_train)
-
-#check testing data
-print ('X_test', '\n', X_test)
-
-#check covid test data
-print ('X_covid_test', '\n', X_covid_test)
-
-# get data sizes
-print(len(X_train),len(y_train), 'train examples')
+print('X_train', '\n', X_train) #check training data
+print('X_test', '\n', X_test) #check testing data
+print('X_covid_test', '\n', X_covid_test) #check covid test data
+print(len(X_train),len(y_train), 'train examples') # get data sizes
 print(len(X_test),len(y_test), 'test examples')
 print(len(X_covid_test),len(y_covid_test), 'covid test examples')
-
-# check correct data shapes for model
-print ('y_train shape', y_train.shape)
-
-print ('X_train shape', X_train.shape)
-
-# import time series split
-from sklearn.model_selection import TimeSeriesSplit # version 0.24.2
+print('y_train shape', y_train.shape) # check correct data shapes for model
+print('X_train shape', X_train.shape)
 
 #split training data in order to optimise RF model on it
 #test_size set to ensure no data leakage at 9106 [depends on size of training data so needs updating if training data size changes]
 #45,844 of training data rows, 314 instances of 146 weeks, around a fifth of 146 is 29, 29x314 = 9106
 
 tscv = TimeSeriesSplit(n_splits=4, test_size=9106)
+print('\n','----Check no data leakage in splits----')
 print(tscv)
 
 #see data splits
@@ -152,26 +121,20 @@ for train_index, test_index in tscv.split(X_train):
      print("TRAIN:", train_index, "TEST:", test_index)
 
 #used to check no data leakage in splits - manually input from above output
-print ("train 1",(df.loc[0,'date']),"to",(df.loc[9419,'date']),"test 1",(df.loc[9420,'date']),"to",(df.loc[18525,'date']))
-print ("train 2",(df.loc[0,'date']),"to",(df.loc[18525,'date']),"test 2",(df.loc[18526,'date']),"to",(df.loc[27631,'date']))
-print ("train 3",(df.loc[0,'date']),"to",(df.loc[27631,'date']),"test 3",(df.loc[27632,'date']),"to",(df.loc[36737,'date']))
-print ("train 4",(df.loc[0,'date']),"to",(df.loc[36737,'date']),"test 4",(df.loc[36738,'date']),"to",(df.loc[45843,'date']))
-
+print("train 1",(df.loc[0,'date']),"to",(df.loc[9419,'date']),"test 1",(df.loc[9420,'date']),"to",(df.loc[18525,'date']))
+print("train 2",(df.loc[0,'date']),"to",(df.loc[18525,'date']),"test 2",(df.loc[18526,'date']),"to",(df.loc[27631,'date']))
+print("train 3",(df.loc[0,'date']),"to",(df.loc[27631,'date']),"test 3",(df.loc[27632,'date']),"to",(df.loc[36737,'date']))
+print("train 4",(df.loc[0,'date']),"to",(df.loc[36737,'date']),"test 4",(df.loc[36738,'date']),"to",(df.loc[45843,'date']))
 
 #used to check no data leakage in splits - manually input from above printed data splits output
-print ("train 1",(df.loc[0,'ltla_name']),"to",(df.loc[9419,'ltla_name']),"test 1",(df.loc[9420,'ltla_name']),"to",(df.loc[18525,'ltla_name']))
-print ("train 2",(df.loc[0,'ltla_name']),"to",(df.loc[18525,'ltla_name']),"test 2",(df.loc[18526,'ltla_name']),"to",(df.loc[27631,'ltla_name']))
-print ("train 3",(df.loc[0,'ltla_name']),"to",(df.loc[27631,'ltla_name']),"test 3",(df.loc[27632,'ltla_name']),"to",(df.loc[36737,'ltla_name']))
-print ("train 4",(df.loc[0,'ltla_name']),"to",(df.loc[36737,'ltla_name']),"test 4",(df.loc[36738,'ltla_name']),"to",(df.loc[45843,'ltla_name']))
+print("train 1",(df.loc[0,'ltla_name']),"to",(df.loc[9419,'ltla_name']),"test 1",(df.loc[9420,'ltla_name']),"to",(df.loc[18525,'ltla_name']))
+print("train 2",(df.loc[0,'ltla_name']),"to",(df.loc[18525,'ltla_name']),"test 2",(df.loc[18526,'ltla_name']),"to",(df.loc[27631,'ltla_name']))
+print("train 3",(df.loc[0,'ltla_name']),"to",(df.loc[27631,'ltla_name']),"test 3",(df.loc[27632,'ltla_name']),"to",(df.loc[36737,'ltla_name']))
+print("train 4",(df.loc[0,'ltla_name']),"to",(df.loc[36737,'ltla_name']),"test 4",(df.loc[36738,'ltla_name']),"to",(df.loc[45843,'ltla_name']))
 
-#import random forest regressor remember for MCR no bootstrapping
-from sklearn.ensemble import RandomForestRegressor as RF_sklearn
-
-#import cross validation grid search
-#set parameters to test, and run search.
+print('\n','----Cross Validation Grid Search----')
+#set parameters to test, and run cross validation grid search.
 #NB manually alter parameters to limit the computational expense of running gridsearch to iteratively optimise see examples below
-
-from sklearn.model_selection import GridSearchCV
 rfc = RF_sklearn(random_state = 42)
 param_grid = { 
             "n_estimators"      : [200, 300, 400], # 300 optimum tested 100,600
@@ -186,19 +149,15 @@ predictions = grid.predict(X_test)
 print(grid.best_params_)
 
 #import packages to produce prediction scores
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import mean_absolute_error
-
 rf_mse = mean_squared_error(y_test, predictions)
 rf_rmse = np.sqrt(rf_mse)
+print('\n','----Prediction Scores----')
 print('Scores from grid search model run on test data')
 print('RMSE', rf_rmse)
 print('r2', r2_score(y_test, predictions))
 print('MAE', mean_absolute_error(y_test, predictions))
 
 #create model with optimised parameters, manually inputted from above gridsearch outputs
-from sklearn.ensemble import RandomForestRegressor as RF_sklearn
 op_rf = RF_sklearn(random_state=42, bootstrap = False, n_jobs = -1, n_estimators = 300, max_features = 'log2', max_depth = 11, min_samples_split = 11)
 
 #fit model with training data
@@ -263,7 +222,6 @@ lin_rmse = np.sqrt(lin_mse)
 print('RMSE, full dataset',lin_rmse)
 
 #just doublechecking r2 using alt method
-from sklearn.metrics import r2_score
 r2_score(y,RDdeath_predictions)
 
 # create visual, plotting predicted and actual deaths from respiratory disease
@@ -274,7 +232,7 @@ plt.plot(y, 'ro', RDdeath_predictions, 'bo')
 plt.ylabel('RD Weekly Deaths')
 plt.xlabel('Weeks from March 2016 to April 2020')
 plt.legend(['Target', 'Prediction'])
-plt.show()
+plt.savefig('fake_outputs/actual_predicted.png')
 
 #commented out as currently below visuals only work in Notebook not in running standard python script
 
@@ -305,7 +263,7 @@ plt.show()
 #plt.legend(handles=[red_patch, blue_patch]);
 
 #feature importance on model "op_rf" inbuilt to scikit-learn python library for random forest - run on training data
-print ('feature importance scores', op_rf.feature_importances_)
+print('feature importance scores', op_rf.feature_importances_)
 
 #visual feature importance
 importances = op_rf.feature_importances_
@@ -316,10 +274,10 @@ plt.title('Feature Importances')
 plt.barh(range(len(indices)), importances[indices], color='b', align='center')
 plt.yticks(range(len(indices)), [features[i] for i in indices])
 plt.xlabel('Relative Importance')
-plt.show()
+plt.savefig('fake_outputs/feature_importance.png')
 
 #import permutation importance variable importance tool - run on training data
-from sklearn.inspection import permutation_importance
+
 perm_importance = permutation_importance(op_rf, X_train, y_train)
 
 #visual for permutation importance
@@ -327,7 +285,7 @@ sorted_idx = perm_importance.importances_mean.argsort()
 print(sorted_idx)
 plt.barh(X.columns[sorted_idx], perm_importance.importances_mean[sorted_idx])
 plt.xlabel("Permutation Importance")
-plt.show()
+plt.savefig('fake_outputs/permutation_importance_1.png')
 
 #run again to see if differences between different instance of op_rf
 perm_importance = permutation_importance(op_rf, X_train, y_train)
@@ -336,30 +294,24 @@ sorted_idx = perm_importance.importances_mean.argsort()
 print(sorted_idx)
 plt.barh(X.columns[sorted_idx], perm_importance.importances_mean[sorted_idx])
 plt.xlabel("Permutation Importance")
-plt.show()
-
-#import SHAP(SHapley Addictive exPlanations) variable importance tool
-import shap # version 0.39.0
+plt.savefig('fake_outputs/permutation_importance_2.png')
 
 #SHAP very computationally expensive - run on sample of 10 (check its working), 100, 1000 (compare to see if major changes between two)
 X_train_shap = shap.sample(X_train, 10)
 explainer = shap.KernelExplainer(op_rf.predict, X_train_shap)
 shap_values = explainer.shap_values(X_train_shap)
 shap.summary_plot(shap_values, X_train_shap)
-plt.show()
+plt.savefig('fake_outputs/shap_10.png')
 
+# X_train_shap = shap.sample(X_train, 100)
+# explainer = shap.KernelExplainer(op_rf.predict, X_train_shap)
+# shap_values = explainer.shap_values(X_train_shap)
+# shap.summary_plot(shap_values, X_train_shap)
+# plt.savefig('fake_outputs/shap_100.png')
 
-X_train_shap = shap.sample(X_train, 100)
-explainer = shap.KernelExplainer(op_rf.predict, X_train_shap)
-shap_values = explainer.shap_values(X_train_shap)
-shap.summary_plot(shap_values, X_train_shap)
-plt.show()
-
-
-X_train_shap = shap.sample(X_train, 1000)
-explainer = shap.KernelExplainer(op_rf.predict, X_train_shap)
-shap_values = explainer.shap_values(X_train_shap)
-shap.summary_plot(shap_values, X_train_shap)
-plt.show()
-
+# X_train_shap = shap.sample(X_train, 1000)
+# explainer = shap.KernelExplainer(op_rf.predict, X_train_shap)
+# shap_values = explainer.shap_values(X_train_shap)
+# shap.summary_plot(shap_values, X_train_shap)
+# plt.savefig('fake_outputs/shap_1000.png')
 

@@ -14,10 +14,12 @@
 *.tax2010
 *.vcf
 *.xml
+!fake_feature_metadata.csv
 
 ### direnv ###
 .direnv
 .envrc
+.DS_Store
 
 ### Django ###
 *.log

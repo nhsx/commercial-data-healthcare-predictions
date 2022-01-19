@@ -13,13 +13,14 @@ _**Note:** No data, public or private are shared in this repository._
 
 - The main code is found in the root of the repository (see Usage below for more information)
 <!-- - The accompanying [report](./reports/report.pdf) is also available in the `reports` folder -->
-- The Python libraries needed are listed in the requirements document. Please take note, you will need to go to https://github.com/gavin-s-smith/mcrforest to install the packages for MCR (Model Class Reliance).  You will also need to install sci-kit learn version 0.24.2 in order to run the code "from sklearn.model_selection import TimeSeriesSplit" .  This TimeSeriesSplit version has the correct parameters to ensure no data leakage in the time series cross validation.   
+- The Python libraries needed are listed in the requirements document. Please take note, you will need to go to https://github.com/gavin-s-smith/mcrforest to install the packages for MCR (Model Class Reliance).  You may need to install numpy and Cython before the mcrforest will install.  You will also need to install sci-kit learn version 0.24.2 in order to run the code "from sklearn.model_selection import TimeSeriesSplit" .  This TimeSeriesSplit version has the correct parameters to ensure no data leakage in the time series cross validation.   
 
 ### Built With
 
-<!-- Include package dependendencies here -->
-<!-- Include link to MCR code repo and eexplanation of use -->
-
+[![Python v3.8](https://img.shields.io/badge/python-v3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
+- [scikit-learn](https://scikit-learn.org/stable/)
+- [Shap] (https://shap.readthedocs.io/en/latest/index.html)
+- [mcrforest] (https://github.com/gavin-s-smith/mcrforest)
 ### Getting Started
 
 #### Installation
@@ -31,13 +32,18 @@ To clone the repo:
 `git clone https://github.com/nhsx/commercial-data-healthcare-predictions.git`
 
 To create a suitable environment:
-- ```python -m venv env```
-- `source env/bin/activate`
-<!-- - `pip install -r requirements.txt` --> 
+- ```python -m venv env``` or ```virtualenv -p /path/to/required/python/version .venv```
+- `source .venv/bin/activate`
+- (may need to) `pip install numpy` & `pip install Cython`
+- `pip install git+https://github.com/gavin-s-smith/mcrforest`
+- `pip install -r requirements.txt`
+
+You may need to install pyscopg2 (https://www.psycopg.org/docs/install.html) which in turn can require gcc and additions to your PATH (https://stackoverflow.com/questions/5420789/how-to-install-psycopg2-with-pip-on-python).  
 
 ### Usage
 
-<!-- explanation of how to use code -->
+run `Create_op_rf_for_mcr.py` <!-- explanation --> 
+run `MCR_for_op_rf.py` <!-- explanation --> 
 
 #### Dataset
 
@@ -45,7 +51,7 @@ Experiments are run against the <!-- data set description -->
 
 ### Roadmap
 
-See the [open issues](https://github.com/nhsx/commercial-data-healthcare-predictions/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/nhsx/commercial-data-healthcare-predictions/issues) for a list of proposed features (and known issues).  <!-- Add any known issues --> 
 
 ### Contributing
 
