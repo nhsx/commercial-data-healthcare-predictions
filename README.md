@@ -40,15 +40,30 @@ To create a suitable environment:
 
 You may need to install pyscopg2 (https://www.psycopg.org/docs/install.html) which in turn can require gcc and additions to your PATH (https://stackoverflow.com/questions/5420789/how-to-install-psycopg2-with-pip-on-python).  
 
+**Caveats for Apple Macbook Pro M1 users:**
+Sklearn will not install using usual methods, the installation errors citing a build dependencies issue.
+Use this line to install; `pip3 install -U --no-use-pep517 scikit-learn==0.24.2`
+More information on this see https://github.com/scikit-learn/scikit-learn/issues/19137
+
 ### Usage
 
-run `Create_op_rf_for_mcr.py` <!-- explanation --> 
-run `MCR_for_op_rf.py` <!-- explanation --> 
+*Note: In it's current form this repoistory has been shared with fake data to allow the codes to run.  This data is randomly sampled from the same metadata features as the data but bears no resemblance to the ground truth data.*
+
+run `Create_op_rf_for_mcr.py` to create a set of models to predict registered deaths from respiratory disease.  These models used commercial sales data and a wide range of other variables, which have shown associations with deaths from respiratory disease.
+
+run `MCR_for_op_rf.py` to create explanations for the models by identifying the different impact variables inputted have on the models’ predictions, including commercial sales data.  This code implements the novel variable importance tool MCR for random forest regressor.
 
 #### Dataset
 
-Experiments are run against the <!-- data set description --> 
-
+Experiments are run against the: 
+- ONS (Office for National Statistics) deaths registered weekly in England from diseases of the respiratory system (ICD-10 Coding J00–J99) https://digital.nhs.uk/services/primary-care-mortality-database;
+- Weekly sales data from a UK high street retailer with stores distributed across the UK obtained through University partnership with UK Retailer;
+- English indices of deprivation 2019 https://www.gov.uk/government/statistics/english-indices-of-deprivation-2019;
+- 2019 mid year population estimates based on the ONS census available at LTLA level and above https://www.nomisweb.co.uk/datasets/pestsyoala;
+- Housing age data from the Valuation Office Agency https://data.cdrc.ac.uk/dataset/dwelling-ages-and-prices/resource/dwelling-age-group-counts-lsoa;
+- Land use in England from 2018 live tables from the Department for Levelling Up, Housing and Communities and Ministry of Housing, Communities & Local Government https://www.gov.uk/government/statistical-data-sets/live-tables-on-land-use;
+- Property type/ethnicity/household composition ONS 2011 census datasets https://www.nomisweb.co.uk/sources/census_2011;
+- Weather. ERA5 data from European Centre for Medium-Range Weather Forecast https://copernicus.eu/.  
 ### Roadmap
 
 See the [open issues](https://github.com/nhsx/commercial-data-healthcare-predictions/issues) for a list of proposed features (and known issues).  <!-- Add any known issues --> 
