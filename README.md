@@ -12,7 +12,7 @@ _**Note:** No data, public or private are shared in this repository._
 ### Project Stucture
 
 - The main code is found in the root of the repository (see Usage below for more information)
-- The accompanying [report](report/NHSX%20Report_ValueofCommercialProductSalesDatainHealthcarePrediction_V2.pdf.pdf) is also available in the `reports` folder.  Results and Discussion can be read as a full pre-print via https://www.researchsquare.com/article/rs-2226531/v1.
+- The accompanying [report](./report/NHSX%20Report_ValueofCommercialProductSalesDatainHealthcarePrediction_V2.pdf) is also available in the `reports` folder.  Results and Discussion can be read as a full pre-print via https://www.researchsquare.com/article/rs-2226531/v1.
 - The Python libraries needed are listed in the requirements document. Please take note, you will need to go to https://github.com/gavin-s-smith/mcrforest to install the packages for MCR (Model Class Reliance).  You may need to install numpy and Cython before the mcrforest will install.  You will also need to install sci-kit learn version 0.24.2 in order to run the code "from sklearn.model_selection import TimeSeriesSplit" .  This TimeSeriesSplit version has the correct parameters to ensure no data leakage in the time series cross validation.   
 
 ### Built With
